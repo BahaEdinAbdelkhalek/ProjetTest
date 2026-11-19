@@ -1,0 +1,21 @@
+# Python
+**/__pycache__/
+*.py[cod]
+**/.coverage
+**/coverage.xml
+**/demo.db
+**/test.db
+**/*.sqlite
+**/*.sqlite3
+
+# Node / Angular
+**/node_modules/
+**/dist/
+frontend/playwright-report/
+frontend/test-results/
+
+# Local secrets and generated runtime files
+.env
+.env.*
+!.env.example
+*.log

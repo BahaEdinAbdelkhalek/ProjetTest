@@ -1,0 +1,8 @@
+FROM mcr.microsoft.com/playwright:v1.51.0-noble
+WORKDIR /tests
+COPY package.e2e.json package.json
+RUN npm install
+COPY playwright.config.ts ./
+COPY e2e ./e2e
+COPY capture-screenshots.cjs ./capture-screenshots.cjs
+CMD ["npx","playwright","test"]

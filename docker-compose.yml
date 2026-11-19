@@ -1,0 +1,15 @@
+services:
+  api:
+    build: ./backend
+    ports: ["8000:8000"]
+    environment:
+      JWT_SECRET: ${JWT_SECRET:-replace-this-secret}
+      DATABASE_URL: sqlite:////data/stockflow.db
+    volumes:
+      - stockflow-data:/data
+  web:
+    build: ./frontend
+    ports: ["4200:80"]
+    depends_on: [api]
+volumes:
+  stockflow-data:

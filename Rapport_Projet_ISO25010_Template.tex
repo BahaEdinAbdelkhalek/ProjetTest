@@ -1,0 +1,312 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[margin=2.2cm]{geometry}
+\usepackage{tabularx,longtable,booktabs,array}
+\usepackage{titlesec}
+\usepackage{fancyhdr}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+\usepackage{parskip}
+
+\renewcommand{\arraystretch}{1.25}
+\renewcommand{\contentsname}{Table des mati\`eres}
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+
+\newcommand{\ph}[1]{\textit{[#1]}}
+\newcommand{\guide}[1]{\par{\small\itshape #1}\par\medskip}
+\newcommand{\ok}{\textit{[Ex\'ecut\'e / Non ex\'ecutable]}}
+
+\titleformat{\section}{\Large\bfseries}{\thesection.}{0.6em}{}[\titlerule]
+\titleformat{\subsection}{\large\bfseries}{\thesubsection}{0.6em}{}
+\titleformat{\subsubsection}{\normalsize\bfseries\itshape}{\thesubsubsection}{0.6em}{}
+\titlespacing*{\section}{0pt}{1.6em}{0.8em}
+\titlespacing*{\subsection}{0pt}{1.2em}{0.5em}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyfoot[C]{\small Rapport de projet ISO/IEC 25010 \textbar{} Page \thepage}
+\renewcommand{\headrulewidth}{0pt}
+
+% Bloc cle/valeur
+\newenvironment{kv}{\par\noindent\tabularx{\textwidth}{|L{4.2cm}|Y|}\hline}{\endtabularx\par\medskip}
+\newcommand{\row}[2]{\textbf{#1} & #2 \\ \hline}
+
+% Bloc d'une caracteristique ISO
+\newcommand{\isoblock}[5]{%
+  \subsection{#2 (ISO #1)}
+  \begin{kv}
+    \row{Exigence du projet}{#3}
+    \row{Seuil mesurable vis\'e}{\ph{#4}}
+    \row{Couche de test associ\'ee}{#5}
+    \row{Outil(s) utilis\'e(s)}{\ph{Nom et version}}
+    \row{Proc\'edure / commande}{\ph{Commande ou sc\'enario ex\'ecut\'e}}
+    \row{R\'esultat obtenu}{\ph{Valeurs mesur\'ees}}
+    \row{Preuve}{\ph{Capture, log ou m\'etrique : r\'ef\'erence Annexe X}}
+    \row{Statut d'ex\'ecution}{\ph{Ex\'ecut\'e / Non ex\'ecutable (proc\'edure fournie, r\'esultat non disponible)}}
+    \row{Analyse et \'ecarts}{\ph{Interpr\'etation, limites, actions correctives}}
+  \end{kv}}
+
+\begin{document}
+
+% ---------- Page de garde ----------
+\begin{titlepage}
+\centering
+\vspace*{1.5cm}
+{\large \ph{NOM DE L'\'ETABLISSEMENT}\par}
+{\large \ph{Ann\'ee universitaire 20XX / 20XX}\par}
+\vspace{2.5cm}
+\rule{\textwidth}{1.2pt}\par\vspace{0.6cm}
+{\Huge\bfseries RAPPORT DE PROJET\par}
+\vspace{0.4cm}
+{\Large Conception, tests et conformit\'e ISO/IEC 25010\par}
+\vspace{0.6cm}\rule{\textwidth}{1.2pt}\par
+\vspace{1.8cm}
+{\Large\bfseries \ph{Nom de l'application} : \ph{domaine m\'etier}\par}
+\vspace{2cm}
+\begin{tabularx}{\textwidth}{|L{4.2cm}|Y|}\hline
+\row{Groupe}{\ph{Nom du groupe}}
+\row{Membres}{\ph{Pr\'enom NOM} / \ph{Pr\'enom NOM} / \ph{Pr\'enom NOM}}
+\row{Encadrant}{\ph{Nom de l'encadrant}}
+\row{D\'ep\^ot Git}{\ph{URL du d\'ep\^ot}}
+\row{Date de remise}{\ph{JJ/MM/AAAA}}
+\row{Version du document}{\ph{v1.0}}
+\end{tabularx}
+\end{titlepage}
+
+\tableofcontents
+\newpage
+
+% ---------- Regle d'or ----------
+\section*{R\`egle d'or du projet}
+\addcontentsline{toc}{section}{R\`egle d'or du projet}
+\fbox{\parbox{0.96\textwidth}{\vspace{2pt}Aucun r\'esultat de test n'est affirm\'e sans preuve d'ex\'ecution r\'eelle. Un outil non ex\'ecutable dans l'environnement du groupe est document\'e comme tel (proc\'edure fournie, r\'esultat non disponible), jamais simul\'e ou invent\'e.\vspace{2pt}}}
+\guide{Chaque r\'esultat de ce rapport doit renvoyer \`a une preuve en annexe (capture, log, rapport g\'en\'er\'e). Utilisez le statut «~Ex\'ecut\'e~» ou «~Non ex\'ecutable~» dans tous les tableaux.}
+
+% ---------- 1 ----------
+\section{Introduction}
+\subsection{Contexte et objectifs}
+\guide{Pr\'esentez le contexte et reprenez les objectifs p\'edagogiques : application m\'etier compl\`ete, qualit\'e int\'egr\'ee d\`es la conception, tests multi-couches, preuve de conformit\'e tra\c{c}able.}
+\ph{Texte}
+\subsection{Domaine m\'etier choisi}
+\guide{Domaine retenu (section 3 du cahier des charges ou domaine propos\'e et valid\'e par l'encadrant). Justifiez la richesse fonctionnelle minimale.}
+\ph{Texte}
+\subsection{P\'erim\`etre fonctionnel}
+\ph{Description du p\'erim\`etre : entit\'es, r\^oles, r\`egles m\'etier, hors p\'erim\`etre}
+\subsection{Organisation de l'\'equipe}
+\noindent\begin{tabularx}{\textwidth}{|L{3cm}|Y|Y|}\hline
+\textbf{Membre} & \textbf{R\^ole / responsabilit\'es} & \textbf{Parties prises en charge} \\ \hline
+\ph{Pr\'enom NOM} & \ph{R\^ole} & \ph{Backend, tests perf, \dots} \\ \hline
+\ph{Pr\'enom NOM} & \ph{R\^ole} & \ph{Frontend, tests E2E, \dots} \\ \hline
+\ph{Pr\'enom NOM} & \ph{R\^ole} & \ph{BDD, s\'ecurit\'e, \dots} \\ \hline
+\end{tabularx}
+\subsection{Planning et gestion de projet}
+\ph{D\'ecoupage en semaines, jalons, m\'ethode (Scrum, Kanban), outils de suivi}
+
+% ---------- 2 ----------
+\section{Conception de l'application}
+\subsection{Sp\'ecification fonctionnelle}
+\subsubsection{Acteurs et r\^oles}
+\guide{Au moins 3 profils utilisateurs distincts avec droits diff\'erenci\'es.}
+\noindent\begin{tabularx}{\textwidth}{|L{3cm}|Y|Y|}\hline
+\textbf{R\^ole} & \textbf{Description} & \textbf{Droits principaux} \\ \hline
+\ph{R\^ole 1} & \ph{\dots} & \ph{\dots} \\ \hline
+\ph{R\^ole 2} & \ph{\dots} & \ph{\dots} \\ \hline
+\ph{R\^ole 3} & \ph{\dots} & \ph{\dots} \\ \hline
+\end{tabularx}
+
+\subsubsection{Exigences fonctionnelles}
+\noindent\begin{tabularx}{\textwidth}{|L{1.5cm}|Y|Y|L{2cm}|}\hline
+\textbf{ID} & \textbf{Exigence} & \textbf{Crit\`ere d'acceptation} & \textbf{Priorit\'e} \\ \hline
+EF-01 & Authentification et gestion des r\^oles & \ph{\dots} & \ph{Haute} \\ \hline
+EF-02 & CRUD complet sur \ph{entit\'e A} & \ph{\dots} & \ph{Haute} \\ \hline
+EF-03 & Workflow \`a statuts : \ph{statut 1 $\rightarrow$ statut 2 $\rightarrow$ statut 3} & \ph{\dots} & \ph{Haute} \\ \hline
+EF-04 & Tableau de bord (indicateurs agr\'eg\'es, filtres) & \ph{\dots} & \ph{Moyenne} \\ \hline
+EF-05 & Recherche / filtrage sur \ph{entit\'e \`a fort volume} & \ph{\dots} & \ph{Moyenne} \\ \hline
+EF-06 & Journal d'audit des actions sensibles & \ph{\dots} & \ph{Haute} \\ \hline
+EF-07 & \ph{Autre exigence} & \ph{\dots} & \ph{\dots} \\ \hline
+\end{tabularx}
+
+\subsubsection{R\`egles m\'etier (au moins 5, explicites et testables)}
+\noindent\begin{tabularx}{\textwidth}{|L{1.5cm}|Y|L{3.2cm}|L{2.4cm}|}\hline
+\textbf{ID} & \textbf{R\`egle m\'etier} & \textbf{Appliqu\'ee dans} & \textbf{Test associ\'e} \\ \hline
+RM-01 & \ph{Ex. unicit\'e d'une r\'eservation par cr\'eneau} & \ph{Service X} & \ph{TU-xx} \\ \hline
+RM-02 & \ph{Ex. quota maximum par utilisateur} & \ph{\dots} & \ph{\dots} \\ \hline
+RM-03 & \ph{Ex. coh\'erence du stock / solde / planning} & \ph{\dots} & \ph{\dots} \\ \hline
+RM-04 & \ph{\dots} & \ph{\dots} & \ph{\dots} \\ \hline
+RM-05 & \ph{\dots} & \ph{\dots} & \ph{\dots} \\ \hline
+\end{tabularx}
+
+\subsubsection{Workflow \`a statuts}
+\guide{Ins\'erez un diagramme d'\'etats. D\'ecrivez les transitions autoris\'ees et les r\^oles habilit\'es.}
+\noindent\begin{tabularx}{\textwidth}{|L{3cm}|L{3cm}|Y|L{3cm}|}\hline
+\textbf{Statut source} & \textbf{Statut cible} & \textbf{Condition} & \textbf{R\^ole autoris\'e} \\ \hline
+\ph{Brouillon} & \ph{Valid\'e} & \ph{\dots} & \ph{\dots} \\ \hline
+\ph{Valid\'e} & \ph{Cl\^otur\'e} & \ph{\dots} & \ph{\dots} \\ \hline
+\end{tabularx}
+
+\subsection{Architecture technique}
+\guide{Sch\'ema d'architecture (couches, composants, flux). D\'ecrivez le d\'ecoupage en couches : pr\'esentation, service, acc\`es aux donn\'ees.}
+\ph{Diagramme d'architecture et description}
+
+\subsection{Mod\`ele de donn\'ees}
+\guide{Au moins 4 entit\'es li\'ees par des relations r\'eelles (1-N, N-N). Ins\'erez le diagramme entit\'e-relation (MCD/MLD ou UML).}
+\noindent\begin{tabularx}{\textwidth}{|L{3cm}|Y|Y|}\hline
+\textbf{Entit\'e} & \textbf{Attributs principaux} & \textbf{Relations} \\ \hline
+\ph{Entit\'e A} & \ph{id, \dots} & \ph{1-N avec B} \\ \hline
+\ph{Entit\'e B} & \ph{\dots} & \ph{\dots} \\ \hline
+\ph{Entit\'e C} & \ph{\dots} & \ph{\dots} \\ \hline
+\ph{Entit\'e D} & \ph{\dots} & \ph{N-N avec A} \\ \hline
+\end{tabularx}
+
+\subsection{Choix techniques justifi\'es}
+\guide{2 \`a 3 lignes de justification par couche, comme demand\'e dans le cahier des charges.}
+\noindent\begin{tabularx}{\textwidth}{|L{3.4cm}|L{3.6cm}|Y|}\hline
+\textbf{Couche} & \textbf{Choix} & \textbf{Justification} \\ \hline
+Backend & \ph{\dots} & \ph{\dots} \\ \hline
+Frontend & \ph{\dots} & \ph{\dots} \\ \hline
+Mobile (optionnel) & \ph{\dots} & \ph{\dots} \\ \hline
+Base de donn\'ees & \ph{\dots} & \ph{\dots} \\ \hline
+Authentification & \ph{JWT / OAuth2 / Sessions} & \ph{\dots} \\ \hline
+Conteneurisation & \ph{Docker / Compose} & \ph{\dots} \\ \hline
+\end{tabularx}
+
+\subsection{S\'ecurit\'e et authentification}
+\ph{M\'ecanisme d'authentification, hachage des mots de passe, gestion des sessions ou jetons, contr\^ole d'acc\`es par r\^ole, journal d'audit}
+\subsection{Maquettes et interfaces}
+\ph{Captures des \'ecrans principaux, parcours utilisateur}
+
+% ---------- 3 ----------
+\newpage
+\section{Strat\'egie de test}
+\subsection{Environnement d'ex\'ecution des tests}
+\begin{kv}
+\row{Syst\`eme d'exploitation}{\ph{\dots}}
+\row{Versions (langage, framework, BDD)}{\ph{\dots}}
+\row{Jeu de donn\'ees de test}{\ph{Description, volum\'etrie, g\'en\'eration}}
+\row{Int\'egration continue}{\ph{GitHub Actions, GitLab CI, aucune}}
+\end{kv}
+
+\subsection{Couches de test et outils}
+\guide{Un \'equivalent dans votre \'ecosyst\`eme est accept\'e si le r\^ole de la couche est assur\'e et prouv\'e par un r\'esultat r\'eel.}
+\noindent\begin{tabularx}{\textwidth}{|L{3.6cm}|L{2.8cm}|Y|L{3cm}|}\hline
+\textbf{Couche de test} & \textbf{Outil retenu} & \textbf{Caract\'eristique ISO 25010} & \textbf{Statut} \\ \hline
+Tests unitaires & \ph{\dots} & Aptitude fonctionnelle, Maintenabilit\'e & \ok \\ \hline
+Tests d'int\'egration & \ph{\dots} & Aptitude fonctionnelle, Fiabilit\'e & \ok \\ \hline
+Tests API & \ph{\dots} & Aptitude fonctionnelle, Compatibilit\'e & \ok \\ \hline
+Tests fonctionnels / E2E & \ph{\dots} & Aptitude fonctionnelle, Facilit\'e d'utilisation & \ok \\ \hline
+Tests de performance & \ph{\dots} & Efficacit\'e de performance & \ok \\ \hline
+Tests de fiabilit\'e & \ph{\dots} & Fiabilit\'e & \ok \\ \hline
+Analyse statique (SAST) & \ph{\dots} & S\'ecurit\'e, Maintenabilit\'e & \ok \\ \hline
+Analyse des d\'ependances (SCA) & \ph{\dots} & S\'ecurit\'e & \ok \\ \hline
+Analyse dynamique (DAST) & \ph{\dots} & S\'ecurit\'e & \ok \\ \hline
+Qualit\'e / maintenabilit\'e & \ph{\dots} & Maintenabilit\'e & \ok \\ \hline
+Tests de compatibilit\'e & \ph{\dots} & Compatibilit\'e & \ok \\ \hline
+Tests de portabilit\'e & \ph{\dots} & Portabilit\'e & \ok \\ \hline
+\end{tabularx}
+
+\subsection{R\'esultats par couche de test}
+\guide{Dupliquez ce bloc pour chacune des 12 couches. Les r\'esultats doivent \^etre copi\'es depuis un rapport g\'en\'er\'e, jamais saisis de m\'emoire.}
+\begin{kv}
+\row{Couche}{\ph{Ex. Tests unitaires}}
+\row{Outil et version}{\ph{\dots}}
+\row{Commande ex\'ecut\'ee}{\ph{\dots}}
+\row{Date d'ex\'ecution}{\ph{JJ/MM/AAAA}}
+\row{Nombre de tests}{\ph{Total / r\'eussis / \'echou\'es}}
+\row{Couverture}{\ph{Si applicable}}
+\row{Rapport g\'en\'er\'e}{\ph{Chemin du fichier, annexe X}}
+\row{Analyse des \'echecs}{\ph{Cause, correction, relance}}
+\end{kv}
+
+% ---------- 4 ----------
+\newpage
+\section{Rapport de conformit\'e ISO/IEC 25010}
+Pour chacune des 8 caract\'eristiques, le groupe d\'emontre une exigence concr\`ete, au moins un test ou outil qui la v\'erifie, et une preuve r\'eelle.
+\subsection{Synth\`ese de conformit\'e}
+\noindent\begin{tabularx}{\textwidth}{|L{1cm}|L{3.4cm}|Y|L{2.6cm}|L{2.6cm}|}\hline
+\textbf{\#} & \textbf{Caract\'eristique} & \textbf{Seuil vis\'e} & \textbf{R\'esultat} & \textbf{Statut} \\ \hline
+6.1 & Aptitude fonctionnelle & \ph{100 \% des cas de test passent} & \ph{\dots} & \ph{Conforme / Partiel / Non conforme} \\ \hline
+6.2 & Efficacit\'e de performance & \ph{p95 $<$ 500 ms \`a 20 utilisateurs} & \ph{\dots} & \ph{\dots} \\ \hline
+6.3 & Compatibilit\'e & \ph{2 navigateurs, API externe} & \ph{\dots} & \ph{\dots} \\ \hline
+6.4 & Facilit\'e d'utilisation & \ph{3 parcours valid\'es} & \ph{\dots} & \ph{\dots} \\ \hline
+6.5 & Fiabilit\'e & \ph{0 incoh\'erence apr\`es panne} & \ph{\dots} & \ph{\dots} \\ \hline
+6.6 & S\'ecurit\'e & \ph{0 vuln\'erabilit\'e critique ou haute} & \ph{\dots} & \ph{\dots} \\ \hline
+6.7 & Maintenabilit\'e & \ph{couverture $\geq$ 70 \%} & \ph{\dots} & \ph{\dots} \\ \hline
+6.8 & Portabilit\'e & \ph{installation sur machine vierge} & \ph{\dots} & \ph{\dots} \\ \hline
+\end{tabularx}
+
+\isoblock{6.1}{Aptitude fonctionnelle}{Toutes les fonctionnalit\'es de la section 4 sont impl\'ement\'ees et exactes}{Ex. 100 \% des cas de test fonctionnels passent}{Tests fonctionnels / E2E}
+\isoblock{6.2}{Efficacit\'e de performance}{Temps de r\'eponse mesur\'e sous charge}{Ex. p95 $<$ 500 ms \`a 20 utilisateurs simultan\'es}{Tests de performance}
+\isoblock{6.3}{Compatibilit\'e}{Fonctionnement sur au moins 2 navigateurs et/ou coexistence avec une API externe}{Ex. Chrome et Firefox, API X}{Tests de compatibilit\'e}
+\isoblock{6.4}{Facilit\'e d'utilisation}{Parcours utilisateur valid\'e (ergonomie, accessibilit\'e de base)}{Ex. 3 parcours valid\'es par N testeurs}{Tests fonctionnels / recette utilisateur}
+\isoblock{6.5}{Fiabilit\'e}{Comportement stable en cas d'erreur ou de panne, sans perte de donn\'ees, reprise correcte}{Ex. 0 incoh\'erence apr\`es coupure de la base}{Tests de fiabilit\'e}
+\isoblock{6.6}{S\'ecurit\'e}{Authentification robuste, contr\^ole d'acc\`es par r\^ole, absence de failles connues (OWASP Top 10)}{Ex. 0 vuln\'erabilit\'e critique ou haute}{SAST / SCA / DAST}
+\isoblock{6.7}{Maintenabilit\'e}{Code en couches, complexit\'e ma\^itris\'ee, couverture de tests mesur\'ee}{Ex. couverture $\geq$ 70 \%, complexit\'e cyclomatique $<$ 10}{Analyse statique / qualit\'e de code}
+\isoblock{6.8}{Portabilit\'e}{Installation reproductible sur une autre machine (script ou conteneur)}{Ex. docker compose up fonctionne sur une machine vierge}{Tests de portabilit\'e / d\'eploiement}
+
+% ---------- 5 ----------
+\newpage
+\section{Matrice de tra\c{c}abilit\'e}
+\guide{Chaque ligne relie une exigence fonctionnelle ou qualit\'e \`a ses tests, outils et r\'esultat r\'eel. Aucune exigence ne doit rester sans test.}
+\noindent\begin{tabularx}{\textwidth}{|L{1.5cm}|Y|L{2.2cm}|L{2.2cm}|L{2.4cm}|L{2cm}|}\hline
+\textbf{Exigence} & \textbf{Description} & \textbf{Test(s)} & \textbf{Outil(s)} & \textbf{R\'esultat} & \textbf{Statut} \\ \hline
+EF-01 & \ph{\dots} & \ph{TU-01, E2E-01} & \ph{\dots} & \ph{\dots} & \ph{\dots} \\ \hline
+EF-02 & \ph{\dots} & \ph{\dots} & \ph{\dots} & \ph{\dots} & \ph{\dots} \\ \hline
+RM-01 & \ph{\dots} & \ph{\dots} & \ph{\dots} & \ph{\dots} & \ph{\dots} \\ \hline
+QS-6.2 & \ph{Temps de r\'eponse sous charge} & \ph{PERF-01} & \ph{\dots} & \ph{\dots} & \ph{\dots} \\ \hline
+QS-6.6 & \ph{S\'ecurit\'e OWASP Top 10} & \ph{SAST-01, DAST-01} & \ph{\dots} & \ph{\dots} & \ph{\dots} \\ \hline
+\ph{\dots} & \ph{\dots} & \ph{\dots} & \ph{\dots} & \ph{\dots} & \ph{\dots} \\ \hline
+\end{tabularx}
+
+% ---------- 6 ----------
+\section{Guide d'installation et d'ex\'ecution}
+\guide{Ce guide doit \^etre reproductible par un tiers sur une machine vierge.}
+\subsection{Pr\'erequis}
+\ph{Versions des outils, ports utilis\'es, variables d'environnement}
+\subsection{Installation}
+\ph{Commandes pas \`a pas : clonage, configuration, docker compose up, migrations, jeu de donn\'ees initial}
+\subsection{Lancement de l'application}
+\ph{URL, comptes de d\'emonstration par r\^ole}
+\subsection{Ex\'ecution des tests}
+\noindent\begin{tabularx}{\textwidth}{|L{5cm}|Y|}\hline
+\textbf{Couche} & \textbf{Commande \`a lancer} \\ \hline
+Tests unitaires & \ph{\dots} \\ \hline
+Tests d'int\'egration & \ph{\dots} \\ \hline
+Tests API & \ph{\dots} \\ \hline
+Tests E2E & \ph{\dots} \\ \hline
+Tests de performance & \ph{\dots} \\ \hline
+Analyses SAST / SCA / DAST & \ph{\dots} \\ \hline
+Couverture et qualit\'e & \ph{\dots} \\ \hline
+\end{tabularx}
+
+% ---------- 7 ----------
+\section{Bilan}
+\subsection{Difficult\'es rencontr\'ees et solutions}
+\ph{Texte}
+\subsection{Limites connues et outils non ex\'ecut\'es}
+\guide{Listez honn\^etement chaque outil ou test non ex\'ecut\'e, avec la raison et la proc\'edure fournie.}
+\noindent\begin{tabularx}{\textwidth}{|L{4cm}|Y|Y|}\hline
+\textbf{Test / outil} & \textbf{Raison de la non-ex\'ecution} & \textbf{Proc\'edure fournie} \\ \hline
+\ph{\dots} & \ph{\dots} & \ph{\dots} \\ \hline
+\end{tabularx}
+\subsection{Perspectives d'am\'elioration}
+\ph{Texte}
+\subsection{Conclusion}
+\ph{Texte}
+
+% ---------- Annexes ----------
+\newpage
+\section*{Annexes}
+\addcontentsline{toc}{section}{Annexes}
+\noindent\begin{tabularx}{\textwidth}{|L{2cm}|Y|Y|}\hline
+\textbf{Annexe} & \textbf{Contenu} & \textbf{Fichier / emplacement} \\ \hline
+A & \ph{Rapport de tests unitaires et couverture} & \ph{\dots} \\ \hline
+B & \ph{Rapport de tests de performance} & \ph{\dots} \\ \hline
+C & \ph{Rapports SAST / SCA / DAST} & \ph{\dots} \\ \hline
+D & \ph{Captures des tests de compatibilit\'e} & \ph{\dots} \\ \hline
+E & \ph{Logs de fiabilit\'e et de portabilit\'e} & \ph{\dots} \\ \hline
+F & \ph{Dictionnaire de donn\'ees complet} & \ph{\dots} \\ \hline
+\end{tabularx}
+
+\end{document}

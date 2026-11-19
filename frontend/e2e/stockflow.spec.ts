@@ -1,0 +1,12 @@
+import {test,expect} from '@playwright/test';
+const suffix=Date.now().toString();
+test('sales user completes product, customer and order workflow',async({page})=>{
+
+ await page.goto('/'); await page.getByLabel('Username').fill('sales');await page.getByLabel('Password').fill('Sales123!');await page.getByRole('button',{name:'Sign in'}).click();await expect(page.getByText(/Signed in as sales/)).toBeVisible();await page.getByRole('button',{name:'Customers'}).click();
+ await page.getByPlaceholder('Name').first().fill(`Browser Customer ${suffix}`);await page.getByPlaceholder('Email').fill(`browser${suffix}@example.test`);await page.getByRole('button',{name:'Add customer'}).click();await expect(page.getByText('Customer saved')).toBeVisible();
+ await page.getByPlaceholder('Search').fill(`Browser Customer ${suffix}`);await expect(page.getByText(`Browser Customer ${suffix}`)).toBeVisible();
+ await page.getByRole('button',{name:'Products'}).click();await page.getByPlaceholder('Name').fill(`Browser Widget ${suffix}`);await page.getByPlaceholder('SKU').fill(`BW${suffix}`);await page.getByPlaceholder('Price').fill('7.50');await page.getByPlaceholder('Stock').fill('4');await page.getByRole('button',{name:'Add product'}).click();await expect(page.getByText(`Browser Widget ${suffix}`)).toBeVisible();
+ await page.getByRole('button',{name:'Orders'}).click();await page.getByLabel('Customer').selectOption({label:`Browser Customer ${suffix}`});await page.getByLabel('Product').selectOption({label:`Browser Widget ${suffix} (stock 4)`});await page.getByLabel('Quantity').fill('2');await page.getByRole('button',{name:'Create draft order'}).click();
+ console.log('after submit',await page.locator('section').innerText());const row=page.getByRole('row').filter({hasText:`Browser Customer ${suffix}`});await expect(row.getByText('draft')).toBeVisible();await row.getByRole('button',{name:'Validate'}).click();await expect(row.getByText('validated')).toBeVisible();await row.getByRole('button',{name:'Close'}).click();await expect(row.getByText('closed')).toBeVisible();
+});
+test('viewer cannot create records and audit tab is hidden',async({page})=>{await page.goto('/');await page.getByLabel('Username').fill('viewer');await page.getByLabel('Password').fill('View123!');await page.getByRole('button',{name:'Sign in'}).click();await expect(page.getByText(/Signed in as viewer/)).toBeVisible();await expect(page.getByRole('button',{name:'Audit'})).toHaveCount(0);await expect(page.getByRole('button',{name:'Add product'})).toBeDisabled();});

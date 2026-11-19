@@ -1,0 +1,34 @@
+const { chromium } = require('@playwright/test');
+const fs = require('node:fs');
+
+(async () => {
+  const out = process.env.SCREENSHOT_DIR || '/screenshots';
+  const base = process.env.BASE_URL || 'http://host.docker.internal:4200';
+  fs.mkdirSync(out, { recursive: true });
+  const browser = await chromium.launch({ headless: true });
+  const page = await browser.newPage({ viewport: { width: 1440, height: 1000 }, deviceScaleFactor: 1 });
+  await page.goto(base);
+  await page.getByLabel('Username').fill('sales');
+  await page.getByLabel('Password').fill('Sales123!');
+  await page.getByRole('button', { name: 'Sign in' }).click();
+  await page.getByText(/Signed in as sales/).waitFor({ timeout: 15000 });
+  await page.screenshot({ path: `${out}/01-dashboard-sales.png`, fullPage: true });
+  await page.getByRole('button', { name: 'Products' }).click();
+  await page.locator('h2').filter({ hasText: 'products' }).waitFor();
+  await page.screenshot({ path: `${out}/02-products.png`, fullPage: true });
+  await page.getByRole('button', { name: 'Customers' }).click();
+  await page.locator('h2').filter({ hasText: 'customers' }).waitFor();
+  await page.screenshot({ path: `${out}/03-customers.png`, fullPage: true });
+  await page.getByRole('button', { name: 'Orders' }).click();
+  await page.locator('h2').filter({ hasText: 'orders' }).waitFor();
+  await page.screenshot({ path: `${out}/04-orders.png`, fullPage: true });
+  await page.getByLabel('Username').fill('admin');
+  await page.getByLabel('Password').fill('Admin123!');
+  await page.getByRole('button', { name: 'Sign in' }).click();
+  await page.getByText(/Signed in as admin/).waitFor({ timeout: 15000 });
+  await page.getByRole('button', { name: 'Audit' }).click();
+  await page.locator('h2').filter({ hasText: 'audit' }).waitFor();
+  await page.screenshot({ path: `${out}/05-audit-admin.png`, fullPage: true });
+  await browser.close();
+  console.log(`Screenshots saved in ${out}`);
+})().catch((error) => { console.error(error); process.exit(1); });
