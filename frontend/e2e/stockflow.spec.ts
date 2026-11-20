@@ -41,10 +41,10 @@ test('sales user completes product, customer and order workflow', async ({ page 
   const row = page.getByRole('row').filter({ hasText: `Browser Customer ${suffix}` }).first();
   await expect(row.getByText('draft')).toBeVisible();
   await row.getByRole('button', { name: 'Validate' }).click();
-  await expect(page.getByText(/validated/)).toBeVisible();
+  await expect(page.getByRole('status')).toContainText('validated');
   await expect(row.getByText('validated')).toBeVisible();
   await row.getByRole('button', { name: 'Close' }).click();
-  await expect(page.getByText(/closed/)).toBeVisible();
+  await expect(page.getByRole('status')).toContainText('closed');
   await expect(row.getByText('closed')).toBeVisible();
 });
 
