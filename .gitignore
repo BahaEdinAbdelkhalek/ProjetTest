@@ -7,10 +7,14 @@
 **/test.db
 **/*.sqlite
 **/*.sqlite3
+.venv/
+.venv*/
 
 # Node / Angular
 **/node_modules/
 **/dist/
+.angular/
+frontend/.angular/
 frontend/playwright-report/
 frontend/test-results/
 

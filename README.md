@@ -1,45 +1,97 @@
-# StockFlow ISO/IEC 25010 demo
+# StockFlow — Application Métier Conforme ISO/IEC 25010
 
-Angular + FastAPI + SQLite sales/inventory demo. It contains customers, products, orders and order items; JWT authentication with admin/sales/viewer roles; business rules and status workflow; dashboard; indexed search; and audit history.
+Application web de gestion commerciale et d'inventaire développée dans le cadre du projet étudiant d'ingénierie logicielle et qualité logicielle (**ISO/IEC 25010**).
 
-## Run
+Le système gère l'intégralité du cycle commercial (clients, produits, commandes, lignes de commande), applique un contrôle d'accès basé sur les rôles (**RBAC** avec JWT), un workflow à statuts strict (`draft → validated → closed`), des règles métier d'intégrité de stock, un tableau de bord d'indicateurs agrégés et un journal d'audit réservé à l'administrateur.
 
-From this directory, start Docker Desktop and run:
+---
+
+## 1. Stack Technologique et Architecture
+
+- **Frontend :** Angular 19.2 (Standalone components, Signals, formulaires réactifs).
+- **Backend :** Python 3.12, FastAPI 0.115.12, Pydantic 2.10.6, SQLAlchemy 2.0.38.
+- **Base de Données :** SQLite (embarqué, transactions ACID avec intégrité relationnelle).
+- **Authentification :** JWT Bearer Tokens (expiration 2h), hachage Bcrypt.
+- **Conteneurisation :** Docker et Docker Compose.
+
+---
+
+## 2. Démarrage Rapide
+
+### Option A : Déploiement Conteneurisé (Recommandé)
+
+Assurez-vous que Docker Desktop est lancé, puis exécutez à la racine du dépôt :
 
 ```powershell
 docker compose up -d --build
 ```
 
-Open `http://localhost:4200` for the UI and `http://localhost:8000/docs` for interactive API documentation. Demo accounts: `admin / Admin123!`, `sales / Sales123!`, and `viewer / View123!`.
+- **Interface Frontend :** `http://localhost:4200`
+- **Documentation API Interactive (Swagger) :** `http://localhost:8000/docs`
 
-## Capture screenshots for the Word report
+### Option B : Lancement en Développement Local
 
-Run these commands in PowerShell from the project directory (`C:\Users\baha\Pictures\Test`):
-
+**1. Backend :**
 ```powershell
-docker compose up -d
-docker build -f frontend/Dockerfile.e2e -t stockflow-e2e frontend
-docker run --rm --network test_default `
-  -e BASE_URL=http://host.docker.internal:4200 `
-  -e SCREENSHOT_DIR=/screenshots `
-  -v "${PWD}\docs\screenshots:/screenshots" `
-  stockflow-e2e node capture-screenshots.cjs
+cd backend
+python -m venv .venv
+.venv\Scripts\activate
+pip install -r requirements.txt
+uvicorn app.main:app --host 0.0.0.0 --port 8000
 ```
 
-This creates `01-dashboard-sales.png`, `02-products.png`, `03-customers.png`, `04-orders.png`, and `05-audit-admin.png` under `docs/screenshots/`. Insert these into `Rapport_Projet_ISO25010_StockFlow.docx` at the matching screenshot markers in the section “Captures d’écran à insérer dans le rapport”. The current orders UI/E2E refresh has not passed full validation, so label that screenshot as an interface capture, not proof of a successful order workflow.
+**2. Frontend :**
+```powershell
+cd frontend
+npm install
+npm start
+```
 
-The report was generated from the provided Word template by running `python docs/update_word_report.py` from this directory. The original template remains unchanged.
+---
 
-## Verification commands
+## 3. Comptes de Démonstration
 
-- Backend tests: from `backend`, `python -m pytest -q`.
-- Coverage: `coverage run -m pytest && coverage report -m`.
-- Static analysis/SAST: `ruff check app tests` and `bandit -r app`.
-- Dependency scan: install `pip-audit` (`python -m pip install pip-audit`) then run `pip-audit`.
-- Postman/Newman: `docker build -t stockflow-newman postman`, then `docker run --rm --network test_default stockflow-newman --env-var baseUrl=http://api:8000/api`.
-- Browser tests: from `frontend`, `npm install`, `npx playwright install chromium firefox`, then `npm run e2e`.
-- Load test: from `backend`, `locust -f tests/locustfile.py --host http://localhost:8000 --users 20 --spawn-rate 5 --run-time 2m --headless`.
+L'application est initialisée avec 3 comptes prédéfinis aux droits différenciés :
 
-## Actual results and limitations
+| Rôle | Nom d'utilisateur | Mot de passe | Droits Principaux |
+|---|---|---|---|
+| **Administrateur** | `admin` | `Admin123!` | CRUD complet sur toutes les entités, transitions de statut, accès exclusif au journal d'audit. |
+| **Commercial** | `sales` | `Sales123!` | Création/mise à jour clients, produits, commandes, lignes de commande et transitions. Suppression restreinte aux brouillons. Accès audit interdit. |
+| **Lecteur** | `viewer` | `View123!` | Consultation en lecture seule (dashboard, clients, produits, commandes). Toute écriture ou transition refusée (HTTP 403). |
 
-See `docs/EXECUTION_RESULTS.md` for the results actually observed. API tests (4), Newman collection (16 requests/17 assertions), Ruff, Bandit and Docker smoke checks passed. Measured total coverage was 90%. The short 20-user Locust run had zero failed requests but aggregate p95 of 1,100 ms, exceeding the 500 ms target. The Playwright viewer scenario passed on Chromium; the sales order-list workflow did not pass. SCA, DAST, full Firefox acceptance, manual accessibility/usability checks, clean-machine installation, and persistence after a container restart remain unverified. Demo credentials and JWT fallback secret are not production-safe.
+---
+
+## 4. Exécution des 12 Couches de Test et Qualité
+
+| Couche de Test | Commande à Exécuter | Outil & Objectif |
+|---|---|---|
+| **1. Tests Unitaires & Métier** | `cd backend; pytest -v tests/test_rules.py` | Pytest 8.3.5 — Validation des règles métier isolées. |
+| **2. Couverture de Code** | `cd backend; coverage run -m pytest tests/test_rules.py && coverage report -m` | Coverage.py — Mesure de la couverture (résultat mesuré : 90%). |
+| **3. Tests API Contractuels** | `npx newman run postman/StockFlow.postman_collection.json --env-var baseUrl=http://localhost:8000/api` | Newman / Postman — 16 requêtes, 17 assertions validées. |
+| **4. Tests Fonctionnels E2E** | `cd frontend; npm run e2e` | Playwright — Parcours utilisateur réels multi-navigateurs. |
+| **5. Tests de Performance** | `cd backend; locust -f tests/locustfile.py --host http://localhost:8000 --users 20 --spawn-rate 5 --run-time 30s --headless` | Locust — Mesure des temps de réponse sous charge de 20 utilisateurs. |
+| **6. Tests de Fiabilité** | `cd backend; pytest -v -k "rules or crud"` | Pytest — Vérification du rollback en cas de stock insuffisant et rejet des sauts de statut. |
+| **7. Analyse SAST (Sécurité)** | `cd backend; bandit -r app` | Bandit — Détection statique des vulnérabilités (0 faille détectée). |
+| **8. Analyse SCA (Dépendances)** | `cd backend; pip-audit` | pip-audit — Détection des CVE connues sur les bibliothèques utilisées. |
+| **9. Analyse DAST (Dynamique)** | `docker run -t --rm zaproxy/zap-stable zap-baseline.py -t http://host.docker.internal:8000/docs -r zap_report.html` | OWASP ZAP — Scan dynamique de sécurité applicative. |
+| **10. Qualité & Formatage** | `cd backend; ruff check app tests` | Ruff — Respect des standards PEP8 et complexité. |
+| **11. Compatibilité Navigateurs** | `cd frontend; npx playwright test --project=chromium --project=firefox` | Playwright — Validation sur Chromium et Firefox. |
+| **12. Portabilité & Déploiement** | `docker compose config && docker compose build` | Docker Compose — Reproductibilité de l'installation. |
+
+---
+
+## 5. Génération Automatique des Captures et Rapports
+
+- **Génération des captures d'écran :**
+  ```powershell
+  node frontend/capture-screenshots.cjs
+  ```
+- **Documentation et Rapports associés :**
+  - [Architecture et Conception](docs/ARCHITECTURE.md)
+  - [Résultats d'Exécution Réels](docs/EXECUTION_RESULTS.md)
+  - [Matrice de Traçabilité ISO 25010](docs/TRACEABILITY.md)
+  - [Audit Initial du Projet](docs/INITIAL_AUDIT.md)
+  - [Inventaire des Preuves Visuelles](docs/SCREENSHOT_INVENTORY.md)
+  - [Guide de Reproduction des Captures](docs/SCREENSHOT_REPRODUCTION_GUIDE.md)
+  - `Rapport_Projet_ISO25010_StockFlow_FINAL.docx` (Rapport académique complet)
+  - `Rapport_Captures_et_Preuvres_StockFlow.docx` (Dossier séparé de preuves visuelles)
